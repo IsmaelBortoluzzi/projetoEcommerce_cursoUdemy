@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'produto',
+    'perfil',
+    'pedido',
 
 
     'debug_toolbar' #remove
@@ -125,7 +128,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (BASE_DIR / 'templates/static',)
 STATIC_ROOT = BASE_DIR / 'static'
 
-MEDIA_ROOT = BASE_DIR / 'templates/media'
+MEDIA_ROOT = BASE_DIR / 'media/'
 MEDIA_URL = '/media/'
 
 # Default primary key field type
