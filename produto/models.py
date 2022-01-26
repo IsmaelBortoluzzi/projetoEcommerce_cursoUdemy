@@ -3,7 +3,7 @@ from django.conf import settings
 import os
 from django.db import models
 from django.utils.text import slugify
-from itertools import count
+from utils import utils
 
 
 class Produto(models.Model):
@@ -24,7 +24,7 @@ class Produto(models.Model):
     )
 
     def get_formatted_price(self):
-        return f'R$ {self.preco_marketing:.2f}'.replace('.', ',')
+        return utils.formata_preco(self.preco_marketing)
 
     @staticmethod
     def resize_img(img, new_width=800):
