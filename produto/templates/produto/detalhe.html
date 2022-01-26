@@ -18,10 +18,10 @@
                     <p class="lead">{{produto.descricao_curta}}</p>
                     <p class="lead">
                         {% if  produto.preco_marketing_promocional %}
-                        <span id="variation-preco" class="lead product-price">
+                        <span id="variation-preco-promocional" class="lead product-price">
                             {{ produto.preco_marketing_promocional | formata_preco}}
                         </span>
-                        <span id="variation-preco-promocional" class="lead product-old-price text-muted">
+                        <span id="variation-preco" class="lead product-old-price text-muted">
                             {{ produto.preco_marketing | formata_preco}}
                         </span>
                         {% else %}
@@ -31,15 +31,14 @@
                         {% endif %}
                     </p>
 
-                    <form action="/addtocart/" id="form-add-to-cart">
+                    <form action="{% url 'produto:add' %}" id="form-add-to-cart">
                         <div class="form-group">
                             <select id="select-variacoes" name="vid" class="form-control form-control-lg">
-                                <option data-preco="R$ 59,90" data-preco-promocional="R$ 39,90" value="45">P
+                                {% for variacao in produto.variacao_set.all %}
+                                <option data-preco="{{ variacao.preco | formata_preco }}" data-preco-promocional="{{ variacao.preco_promocional | formata_preco }}" value="{{ variacao.id }}">
+                                    {{ variacao }}
                                 </option>
-                                <option data-preco="R$ 51,90" data-preco-promocional="R$ 49,90" value="45">M
-                                </option>
-                                <option data-preco="R$ 52,90" data-preco-promocional="R$ 89,90" value="45">G
-                                </option>
+                                {% endfor %}
                             </select>
                         </div>
 
@@ -49,8 +48,8 @@
                                 Adicionar ao carrinho
                             </button>
                         </div>
-
                     </form>
+
                 </div>
             </div>
         </div>
