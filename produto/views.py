@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.contrib import messages
+from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.views.generic.list import ListView
 from django.views import View
 from . import models
@@ -20,7 +21,33 @@ class DetalheProduto(DetailView):
 
 
 class AddCarrinhoProdutos(View):
-    pass
+    def get(self, *args, **kwargs):
+
+        http_referer = self.request.META.get(
+            'HTTP_REFERER',
+            reverse('produto:lista')
+        )  # redirect para a url que o user estava antes
+
+        variacao_id = self.request.GET.get('vid')
+
+        if not variacao_id:
+            messages.error(self.request, 'Produto não encontrado')
+            return redirect(http_referer)
+
+        variacao = get_object_or_404(models.Variacao, id=variacao_id)
+
+        if not self.request.session.get('carrinho'):
+            self.request.session['carrinho'] = {}
+            self.request.session.save()
+
+        carrinho = self.request.session['carrinho']
+
+        if variacao_id in carrinho:
+            pass
+        else:
+            pass
+
+        return redirect('/')
 
 
 class RemoveCarrinhoProdutos(View):
