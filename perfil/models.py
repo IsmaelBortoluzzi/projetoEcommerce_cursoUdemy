@@ -61,9 +61,6 @@ class Perfil(models.Model):
         if error_messages:
             raise ValidationError(error_messages)
 
-
-
-
     class Meta:
         verbose_name = 'Perfil'
         verbose_name_plural = 'Perfis'

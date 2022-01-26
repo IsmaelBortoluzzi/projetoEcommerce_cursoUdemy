@@ -2,6 +2,8 @@ from PIL import Image
 from django.conf import settings
 import os
 from django.db import models
+from django.utils.text import slugify
+from itertools import count
 
 
 class Produto(models.Model):
@@ -9,7 +11,7 @@ class Produto(models.Model):
     descricao_curta = models.TextField(max_length=255)
     descricao_longa = models.TextField()
     imagem = models.ImageField(upload_to='produto_imagens/%Y/%m', blank=True, null=True)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, blank=True, null=True)
     preco_marketing = models.FloatField()
     preco_marketing_promocional = models.FloatField(default=0)
     tipo = models.CharField(
@@ -20,6 +22,9 @@ class Produto(models.Model):
             ('S', 'Simples')
         )
     )
+
+    def get_formatted_price(self):
+        return f'R$ {self.preco_marketing:.2f}'.replace('.', ',')
 
     @staticmethod
     def resize_img(img, new_width=800):
@@ -41,10 +46,13 @@ class Produto(models.Model):
         )
 
     def save(self, *args, **kwargs):
+        if not self.slug:
+            slug = f'{slugify(self.nome)}'
+            self.slug = slug
+
         super().save(*args, **kwargs)
 
         max_img_size = 790
-
         if self.imagem:
             self.resize_img(self.imagem, max_img_size)
 
