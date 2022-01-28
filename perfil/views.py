@@ -1,9 +1,11 @@
+from django.contrib import messages
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView
 from django.views import View
 from . import models
 from . import forms
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login
 import copy
 
 
@@ -45,6 +47,9 @@ class BasePerfil(View):
         self.request.session['carrinho'] = self.carrinho
         self.request.session.save()
 
+        if self.request.user.is_authenticated:
+            self.template_name = 'perfil/atualizar.html'
+
         self.rendenizar = render(self.request, self.template_name, self.contexto)
         return self.rendenizar
 
@@ -75,6 +80,14 @@ class CriarPerfil(BasePerfil):
             usuario.last_name = last_name
             usuario.save()
 
+            if not self.perfil:
+                self.perfilform.cleaned_data['usuario'] = usuario
+                perfil = models.Perfil(**self.perfilform.cleaned_data)
+                perfil.save()
+            else:
+                perfil = self.perfilform.save(commit=False)
+                perfil.usuario = usuario
+                perfil.save()
         else:
             usuario = self.userform.save(commit=False)  # commit=false pq precisa encriptar a senha ainda
             usuario.set_password(password)
@@ -84,6 +97,24 @@ class CriarPerfil(BasePerfil):
             perfil.usuario = usuario
             perfil.save()
 
+            if password:
+                autentica = authenticate(self.request, username=usuario, password=password)
+
+                if autentica:
+                    login(self.request, user=usuario)
+
+        self.request.session['carrinho'] = self.carrinho
+        self.request.session.save()
+
+        messages.success(
+            self.request,
+            'Seu cadastro foi criado ou atualizado com sucesso.'
+        )
+
+        messages.success(
+            self.request,
+            'Você fez login e pode concluir sua compra.'
+        )
         return self.rendenizar
 
 
