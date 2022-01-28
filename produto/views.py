@@ -153,5 +153,5 @@ class CarrinhoProduto(View):
         return render(self.request, 'produto/carrinho.html', contexto)  # o 3° arg de render é o context
 
 
-class FinalizarProduto(View):
+class ResumoProduto(View):
     pass
