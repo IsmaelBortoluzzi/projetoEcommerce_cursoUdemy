@@ -121,7 +121,7 @@ class CriarPerfil(BasePerfil):
             'Você fez login e pode concluir sua compra.'
         )
         return redirect('perfil:finalizar')
-        return self.rendenizar
+        # return self.rendenizar
 
 
 class AtualizarPerfil(View):
