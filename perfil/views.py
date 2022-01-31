@@ -1,11 +1,12 @@
 from django.contrib import messages
-from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView
 from django.views import View
 from . import models
 from . import forms
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 import copy
 
 
@@ -60,6 +61,10 @@ class BasePerfil(View):
 class CriarPerfil(BasePerfil):
     def post(self, *args, **kwargs):
         if not self.userform.is_valid() or not self.perfilform.is_valid():
+            messages.error(
+                self.request,
+                'Existem erros no seu formulário de cadastro!'
+            )
             return self.rendenizar
 
         username = self.userform.cleaned_data.get('username')
@@ -115,6 +120,7 @@ class CriarPerfil(BasePerfil):
             self.request,
             'Você fez login e pode concluir sua compra.'
         )
+        return redirect('perfil:finalizar')
         return self.rendenizar
 
 
@@ -124,11 +130,37 @@ class AtualizarPerfil(View):
 
 
 class LoginPerfil(View):
-    def get(self, *args, **kwargs):
-        pass
+    def post(self, *args, **kwargs):
+        username = self.request.POST.get('username')
+        password = self.request.POST.get('password')
+
+        if not username or not password:
+            messages.error(
+                self.request,
+                'Usuário ou senha inválidos.'
+            )
+            return redirect('perfil:criar')
+
+        usuario = authenticate(self.request, username=username, password=password)
+
+        if not usuario:
+            login(self.request, user=username)
+            messages.error(
+                self.request,
+                'Você fez login no sistema e pode concluir sua compra.'
+            )
+            return redirect('perfil:criar')
+
+        login(self.request, user=usuario)
+        return redirect('produto:carrinho')
 
 
 class LogoutPerfil(View):
     def get(self, *args, **kwargs):
-        pass
+        carrinho = copy.deepcopy(self.request.session.get('carrinho'))
 
+        logout(self.request)
+
+        self.request.session['carrinho'] = carrinho
+        self.request.session.save()
+        return redirect('produto:lista')
