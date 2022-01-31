@@ -1,6 +1,8 @@
 from django.urls import path
 from . import views
 
+app_name = 'perfil'
+
 urlpatterns = [
     path('', views.CriarPerfil.as_view(), name='criar'),
     path('atualizar/', views.AtualizarPerfil.as_view(), name='atualizar'),
