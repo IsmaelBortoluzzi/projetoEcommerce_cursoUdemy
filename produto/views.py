@@ -5,12 +5,14 @@ from django.views import View
 from . import models
 from django.views.generic.detail import DetailView
 from perfil.models import Perfil
+from django.db.models import Q
+
 
 class ListaProdutos(ListView):
     model = models.Produto
     template_name = 'produto/lista.html'
     context_object_name = 'produtos'
-    paginate_by = 10
+    paginate_by = 5
 
 
 class DetalheProduto(DetailView):
@@ -170,7 +172,28 @@ class ResumoProduto(View):
         contexto = {
             'usuario': self.request.user,
             'carrinho': self.request.session['carrinho']
-
         }
 
         return render(self.request, 'produto/resumodacompra.html', contexto)
+
+
+class Busca(ListaProdutos):
+
+    def get_queryset(self, *args, **kwargs):
+        termo = self.request.GET.get('termo') or self.request.session['termo']
+        qs = super().get_queryset()
+
+        if not termo:
+            return qs
+
+        self.request.session['termo'] = termo
+
+        qs = qs.filter(
+            Q(nome__icontains=termo) |
+            Q(descricao_curta__icontains=termo) |
+            Q(descricao_longa__icontains=termo)
+        )
+
+        self.request.session.save()
+
+        return qs
