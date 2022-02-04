@@ -80,7 +80,7 @@ class AddCarrinhoProdutos(View):
                     f'Estoque insuficiente para {quantidade_carrinho}x no produto "{produto_nome}".'
                     f'Adicionamos {variacao_estoque}x no seu carrinho.'
                 )
-                quantidade_carrinho = quantidade_carrinho
+                quantidade_carrinho = variacao_estoque
 
             carrinho[variacao_id]['quantidade'] = quantidade_carrinho
             carrinho[variacao_id]['preco_quantitativo'] = preco_unitario * quantidade_carrinho

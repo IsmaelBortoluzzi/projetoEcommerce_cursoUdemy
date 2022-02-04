@@ -120,7 +120,7 @@ class CriarPerfil(BasePerfil):
             self.request,
             'Você fez login e pode concluir sua compra.'
         )
-        return redirect('perfil:finalizar')
+        return redirect('produto:lista')
         # return self.rendenizar
 
 
